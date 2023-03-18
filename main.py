@@ -24,9 +24,10 @@ logger = logging.getLogger(__name__)
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-TELEGRAM_TOKEN = config["security"]["telegram_token"]
-GIPHY_TOKEN = config["security"]["giphy_token"]
-
+TELEGRAM_TOKEN = config["security"]["TELEGRAM_TOKEN"]
+GIPHY_TOKEN = config["security"]["GIPHY_TOKEN"]
+URL = config["security"]["URL"]
+PORT = config["security"]["PORT"]
 
 async def giphy(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a GIF to your message."""
@@ -57,7 +58,14 @@ def main() -> None:
     # Help Command
     application.add_handler(CommandHandler("help", help))
     # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+    application.updater.start_webhook(
+        listen='0.0.0.0',
+        port=PORT,
+        url_path=TELEGRAM_TOKEN,
+        key='private.key',
+        cert='cert.pem',
+        webhook_url=f'https://{URL}:{PORT}/{TELEGRAM_TOKEN}'
+    )
 
 
 if __name__ == "__main__":
